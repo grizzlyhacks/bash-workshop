@@ -90,6 +90,8 @@ echo "num / 2 = ${num}"
 #  - let <var>=<math expression>
 #    This is a bit more verbose but allows you to use more advanced math
 #    operators like *=, /=, %=, +=, -=, <<=, >>=, &=, ^=, |=
+let num=4 # 4
+echo "num = ${num}"
 let num+=10 # 14
 echo "num += 10 = ${num}"
 let num/=2 # 7
