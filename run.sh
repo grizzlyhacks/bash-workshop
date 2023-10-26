@@ -8,6 +8,8 @@
 #   - once a blank line is found, run the stored lines as a bash script
 #   - repeat until the end of the file is reached
 
+# set -x
+
 # Get the script name from the first argument
 SCRIPT_NAME="${1}"
 
@@ -23,17 +25,17 @@ C_DARK_GRAY="\033[1;30m"
 C_BOLD="\033[1m"
 C_GREEN="\033[0;32m"
 
-# Line buffer
-BUFFER=""
+# code buffer
+CODE_BUFFER=()
 
 # Define a function to print a line of text in dark gray
 function print_comment() {
-    echo -e "${C_DARK_GRAY}${@}${C_RESET}"
+    printf "${C_DARK_GRAY}%s${C_RESET}\n" "${@}"
 }
 
 # Define a function to print code in green
 function print_code() {
-    echo -e "${C_GREEN}${@}${C_RESET}"
+    printf "${C_GREEN}%s${C_RESET}\n" "${@}"
 }
 
 # Print the script name in bold
@@ -41,32 +43,34 @@ echo -e "${C_BOLD}${SCRIPT_NAME}${C_RESET}"
 
 # Read the file line by line
 let code_block_count=0
+let line_num=0
 while IFS= read -r line; do
+    let line_num++
+
     # If the line is a comment, print it in dark gray
     if [[ "${line}" =~ ^[[:space:]]*("#".*) ]]; then
         print_comment "${BASH_REMATCH[1]}"
     # If the line is not a comment, store it in the buffer
-    else
-        BUFFER="${BUFFER}${line}\n"
-    fi
+    elif grep -qE '^[[:space:]]*[^#]' <<< "${line}"; then
+        CODE_BUFFER+=("${line}")
+    elif [[ -z "${line}" ]]; then
+        # If the line is blank, and we have code in the buffer, run it
+        if [[ ${#CODE_BUFFER[@]} -gt 0 ]]; then
+            # Print the code
+            print_code "${CODE_BUFFER[@]}"
 
-    # If the line is blank, and we have code in the buffer, run it
-    if [[ -z "${line}" && -n "${BUFFER}" ]]; then
-        # If this is not the first code block, print a blank line
-        if [[ ${code_block_count} -gt 0 ]]; then
-            echo
+            # Run the buffer as a bash script
+            eval "$(printf "%s\n" "${CODE_BUFFER[@]}")" \
+                | sed -e 's/^/> /'
+
+            # Clear the buffer
+            CODE_BUFFER=()
+
+            # Increment the code block count
+            let code_block_count++
         fi
 
-        # Print the code
-        print_code "${BUFFER}"
-
-        # Run the buffer as a bash script
-        eval "${BUFFER}"
-
-        # Clear the buffer
-        BUFFER=""
-
-        # Increment the code block count
-        let code_block_count++
+        # Echo the blank line
+        echo
     fi
-done < "${1}"
+done < "${SCRIPT_NAME}"
