@@ -1,0 +1,43 @@
+# agenda
+- installation
+- variables
+  - types
+    - strings
+    - arrays
+    - associative arrays
+    - integers (mostly)
+      declare -p still shows as a string, but $((i + 1)) still works **
+- show a list of basic commands (separated by built-in vs not) and operators
+  - built-in
+    - `man builtins`
+  - external programs
+    - sed, awk, grep, ls, echo, bash, which, etc...
+    - show location on filesystem, e.g.: `ls /bin/`
+  - show some examples
+    - echo "hello world"
+    - grep 'hello' file.txt
+- redirection
+  - examples
+    - saving output to a file with '>'
+    - reading a file as input with '<' (using sed)
+    - reading a variable as input with '<<<'
+- pipes
+  - examples
+    - echo 'hello world' | sed 's/h/c/'
+- BASH SCRIPTS
+  - shebang
+  - chmod +x
+  - functions
+    - passing parameters to functions, compare to normal java/python functions
+  - if statements
+    - ** talk about hacky boolean option
+    - show conditions
+    - talk about command exit status codes
+  - for loops
+    - over arrays
+    - ((i=0; i<X; i++))
+  - while loops
+- stdout / stderr
+  - examples
+
+** talk about this later
